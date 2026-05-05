@@ -23,8 +23,7 @@ app.get('/api/purchases', async (req, res) => {
     const { data, error } = await supabase
       .from('purchases')
       .select('*')
-      .order('date', { ascending: false })
-      .execute();
+      .order('date', { ascending: false });
     if (error) throw error;
     res.json(data);
   } catch (err) {
@@ -36,7 +35,7 @@ app.get('/api/purchases', async (req, res) => {
 // POST /api/purchases - Add a new purchase (requires correct password)
 app.post('/api/purchases', async (req, res) => {
   const { packs, password } = req.body;
-  const SECRET_PASSWORD = '*+++*'; // <-- troque pela sua senha real
+  const SECRET_PASSWORD='***'; // <-- troque pela sua senha real
 
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
@@ -50,9 +49,7 @@ app.post('/api/purchases', async (req, res) => {
         packs,
         stickers: packs * 7,
         cost: packs * 1.5,
-      })
-      .single(); // return the inserted row
-
+      });
     if (error) throw error;
     res.status(201).json(data);
   } catch (err) {
@@ -65,7 +62,7 @@ app.post('/api/purchases', async (req, res) => {
 app.delete('/api/purchases/:id', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
-  const SECRET_PASSWORD = '*+++*'; // <-- troque pela sua senha real
+  const SECRET_PASSWORD='***'; // <-- troque pela sua senha real
 
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
@@ -76,7 +73,6 @@ app.delete('/api/purchases/:id', async (req, res) => {
       .from('purchases')
       .delete()
       .eq('id', parseInt(id));
-
     if (error) throw error;
     res.json({ message: 'Compra eliminada' });
   } catch (err) {
