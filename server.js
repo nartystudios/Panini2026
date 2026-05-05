@@ -35,7 +35,7 @@ app.get('/api/purchases', async (req, res) => {
 // POST /api/purchases - Add a new purchase (requires correct password)
 app.post('/api/purchases', async (req, res) => {
   const { packs, password } = req.body;
-  const SECRET_PASSWORD='***'; // <-- troque pela sua senha real
+  const SECRET_PASSWORD='cricri'; // <-- troque pela sua senha real
 
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
@@ -62,7 +62,7 @@ app.post('/api/purchases', async (req, res) => {
 app.delete('/api/purchases/:id', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
-  const SECRET_PASSWORD='***'; // <-- troque pela sua senha real
+  const SECRET_PASSWORD='cricri'; // <-- troque pela sua senha real
 
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
