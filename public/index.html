@@ -8,17 +8,26 @@
     body {font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem;}
     h1 {text-align: center;}
     .summary {margin-top: 1rem; padding: 1rem; border: 1px solid #ddd;}
-    input[type='number'] {width: 80px;}
-    button {margin-left: .5rem;}
+    input[type='number'], input[type='password'] {width: 120px; padding: 0.3rem;}
+    button {margin-left: .5rem; padding: 0.4rem 0.8rem;}
     ul {list-style:none; padding:0;}
     li {margin: .5rem 0; border-bottom:1px solid #eee; padding-bottom:.5rem;}
+    .error {color: #d00; font-size: 0.9rem;}
   </style>
 </head>
 <body>
   <h1>Registo de Saquetas de Cromos</h1>
+
   <div>
     <label for="packs">Número de saquetas:</label>
     <input type="number" id="packs" min="1" value="1" />
+  </div>
+  <div style="margin-top:0.5rem;">
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="cricri" />
+    <span id="errorMsg" class="error"></span>
+  </div>
+  <div style="margin-top:0.8rem;">
     <button id="addBtn">Adicionar</button>
   </div>
 
@@ -31,39 +40,74 @@
   <ul id="history"></ul>
 
   <script>
-    const api = '/api/purchases';
-    async function loadData() {
-      const res = await fetch(api);
-      const data = await res.json();
-      const purchases = data.purchases || [];
+    const STORAGE_KEY = 'sticker_purchases';
+    const PASSWORD = 'cricri';
+
+    function loadPurchases() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function savePurchases(purchases) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(purchases));
+    }
+
+    function render() {
+      const purchases = loadPurchases();
       const totalStickers = purchases.reduce((a, p) => a + p.stickers, 0);
       const totalCost = purchases.reduce((a, p) => a + p.cost, 0);
       document.getElementById('totalStickers').textContent = totalStickers;
       document.getElementById('totalCost').textContent = totalCost.toFixed(2);
       const list = document.getElementById('history');
       list.innerHTML = '';
-      purchases.slice().reverse().forEach(p => {
+      purchases.slice().reverse().forEach((p, idx) => {
         const li = document.createElement('li');
-        li.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, gasto ${p.cost.toFixed(2)} €`;
+        li.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, gasto ${p.cost.toFixed(2)} € `;
         const del = document.createElement('button');
         del.textContent = 'Eliminar';
-        del.style.marginLeft = '1rem';
-        del.onclick = async () => {
-          await fetch(`${api}/${p.id}`, {method: 'DELETE'});
-          loadData();
+        del.onclick = () => {
+          const pwd = prompt('Password para eliminar:');
+          if (pwd !== PASSWORD) { alert('Password incorreta!'); return; }
+          const purchases = loadPurchases();
+          purchases.splice(purchases.length - 1 - idx, 1); // because reversed
+          savePurchases(purchases);
+          render();
         };
         li.appendChild(del);
         list.appendChild(li);
       });
     }
-    document.getElementById('addBtn').onclick = async () => {
+
+    document.getElementById('addBtn').onclick = () => {
       const packs = parseInt(document.getElementById('packs').value);
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
+
       if (!packs || packs < 1) return alert('Número inválido');
-      await fetch(api, {method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({packs})});
+      if (password !== PASSWORD) {
+        errorMsg.textContent = 'Password incorreta!';
+        return; // mantém o valor para correção
+      }
+
+      const purchase = {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        packs,
+        stickers: packs * 7,
+        cost: packs * 1.5
+      };
+
+      const purchases = loadPurchases();
+      purchases.push(purchase);
+      savePurchases(purchases);
+
       document.getElementById('packs').value = 1;
-      loadData();
+      document.getElementById('password').value = '';
+      render();
     };
-    loadData();
+
+    render();
   </script>
 </body>
 </html>
