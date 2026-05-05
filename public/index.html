@@ -8,7 +8,7 @@
     body {font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem;}
     h1 {text-align: center;}
     .summary {margin-top: 1rem; padding: 1rem; border: 1px solid #ddd;}
-    input[type='number'], input[type='password'] {width: 120px; padding: 0.3rem;}
+    input[type='number'], input[type='password'], input[type='date'] {width: 120px; padding: 0.3rem;}
     button {margin-left: .5rem; padding: 0.4rem 0.8rem;}
     ul {list-style:none; padding:0;}
     li {margin: .5rem 0; border-bottom:1px solid #eee; padding-bottom:.5rem;}
@@ -21,6 +21,10 @@
   <div>
     <label for="packs">Número de saquetas:</label>
     <input type="number" id="packs" min="1" value="1" />
+  </div>
+  <div style="margin-top:0.5rem;">
+    <label for="date">Data (opcional):</label>
+    <input type="date" id="date" />
   </div>
   <div style="margin-top:0.5rem;">
     <label for="password">Password:</label>
@@ -42,7 +46,7 @@
   <script>
     // API endpoints
     const API_URL = '/api/purchases';
-    const PASSWORD='cricri'; // mesma password do server.js
+    const PASSWORD='***'; // mesma password do server.js
 
     // Carregar compras da API
     async function loadPurchases() {
@@ -56,11 +60,11 @@
     }
 
     // Adicionar compra via API
-    async function addPurchase(packs, password) {
+    async function addPurchase(packs, password, date) {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packs, password })
+        body: JSON.stringify({ packs, password, date })  // date pode ser null
       });
       return response.json();
     }
@@ -105,12 +109,13 @@
     document.getElementById('addBtn').onclick = async () => {
       const packs = parseInt(document.getElementById('packs').value);
       const password = document.getElementById('password').value;
+      const date = document.getElementById('date').value || null;  // date optional
       const errorMsg = document.getElementById('errorMsg');
       errorMsg.textContent = '';
 
       if (!packs || packs < 1) return alert('Número inválido');
 
-      const result = await addPurchase(packs, password);
+      const result = await addPurchase(packs, password, date);
       if (result.error) {
         errorMsg.textContent = result.error;
         return;
@@ -118,6 +123,7 @@
 
       document.getElementById('packs').value = 1;
       document.getElementById('password').value = '';
+      document.getElementById('date').value = '';
       render();
     };
 

@@ -32,39 +32,41 @@ app.get('/api/purchases', async (req, res) => {
   }
 });
 
-// POST /api/purchases - Add a new purchase (requires correct password)
+// POST /api/purchases - Add a new purchase
 app.post('/api/purchases', async (req, res) => {
-  const { packs, password } = req.body;
-  const SECRET_PASSWORD='cricri'; // <-- troque pela sua senha real
+  const { packs, password, data } = req.body;  // Adicionado campo 'data'
+  const SECRET_PASSWORD = 'cricri';
 
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
   }
 
   try {
-    const { data, error } = await supabase
+    // Use data se fornecido, senão usa a data atual
+    const insertDate = data || new Date().toISOString().split('T')[0];
+
+    const { data: dbRes, error } = await supabase
       .from('purchases')
       .insert({
-        date: new Date().toISOString().split('T')[0],
+        date: insertDate,
         packs,
         stickers: packs * 7,
         cost: packs * 1.5,
       })
       .select();
+
     if (error) throw error;
-    res.status(201).json(data);
+    res.status(201).json(dbRes);
   } catch (err) {
     console.error('Supabase POST error:', err);
     res.status(500).json({ error: 'Erro ao inserir compra' });
   }
 });
 
-// DELETE /api/purchases/:id - Remove a purchase (requires correct password)
+// DELETE /api/purchases/:id - Remove a purchase
 app.delete('/api/purchases/:id', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
-  const SECRET_PASSWORD='cricri'; // <-- troque pela sua senha real
-
   if (password !== SECRET_PASSWORD) {
     return res.status(403).json({ error: 'Password incorreta' });
   }
