@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registo de Saquetas de Cromos</title>
+  <style>
+    body {font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem;}
+    h1 {text-align: center;}
+    .summary {margin-top: 1rem; padding: 1rem; border: 1px solid #ddd;}
+    input[type='number'] {width: 80px;}
+    button {margin-left: .5rem;}
+    ul {list-style:none; padding:0;}
+    li {margin: .5rem 0; border-bottom:1px solid #eee; padding-bottom:.5rem;}
+  </style>
+</head>
+<body>
+  <h1>Registo de Saquetas de Cromos</h1>
+  <div>
+    <label for="packs">Número de saquetas:</label>
+    <input type="number" id="packs" min="1" value="1" />
+    <button id="addBtn">Adicionar</button>
+  </div>
+
+  <div class="summary" id="summary">
+    <p>Total de cromos: <span id="totalStickers">0</span></p>
+    <p>Total gasto: <span id="totalCost">0.00</span> €</p>
+  </div>
+
+  <h2>Histórico de compras</h2>
+  <ul id="history"></ul>
+
+  <script>
+    const api = '/api/purchases';
+    async function loadData() {
+      const res = await fetch(api);
+      const data = await res.json();
+      const purchases = data.purchases || [];
+      const totalStickers = purchases.reduce((a, p) => a + p.stickers, 0);
+      const totalCost = purchases.reduce((a, p) => a + p.cost, 0);
+      document.getElementById('totalStickers').textContent = totalStickers;
+      document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+      const list = document.getElementById('history');
+      list.innerHTML = '';
+      purchases.slice().reverse().forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, gasto ${p.cost.toFixed(2)} €`;
+        const del = document.createElement('button');
+        del.textContent = 'Eliminar';
+        del.style.marginLeft = '1rem';
+        del.onclick = async () => {
+          await fetch(`${api}/${p.id}`, {method: 'DELETE'});
+          loadData();
+        };
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+    document.getElementById('addBtn').onclick = async () => {
+      const packs = parseInt(document.getElementById('packs').value);
+      if (!packs || packs < 1) return alert('Número inválido');
+      await fetch(api, {method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({packs})});
+      document.getElementById('packs').value = 1;
+      loadData();
+    };
+    loadData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "panini-sticker-tracker",
+  "version": "1.0.0",
+  "description": "Web app to track sticker pack purchases",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
