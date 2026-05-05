@@ -40,24 +40,49 @@
   <ul id="history"></ul>
 
   <script>
-    const STORAGE_KEY = 'sticker_purchases';
-    const PASSWORD = 'cricri';
+    // API endpoints
+    const API_URL = '/api/purchases';
+    const PASSWORD = '*+++*'; // mesma password do server.js
 
-    function loadPurchases() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
+    // Carregar compras da API
+    async function loadPurchases() {
+      try {
+        const response = await fetch(API_URL);
+        return await response.json();
+      } catch (err) {
+        console.error('Erro ao carregar compras:', err);
+        return [];
+      }
     }
 
-    function savePurchases(purchases) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(purchases));
+    // Adicionar compra via API
+    async function addPurchase(packs, password) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packs, password })
+      });
+      return response.json();
     }
 
-    function render() {
-      const purchases = loadPurchases();
+    // Eliminar compra via API
+    async function deletePurchase(id, password) {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      return response.json();
+    }
+
+    // Renderizar interface
+    async function render() {
+      const purchases = await loadPurchases();
       const totalStickers = purchases.reduce((a, p) => a + p.stickers, 0);
       const totalCost = purchases.reduce((a, p) => a + p.cost, 0);
       document.getElementById('totalStickers').textContent = totalStickers;
       document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+
       const list = document.getElementById('history');
       list.innerHTML = '';
       purchases.slice().reverse().forEach((p, idx) => {
@@ -65,12 +90,10 @@
         li.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, gasto ${p.cost.toFixed(2)} € `;
         const del = document.createElement('button');
         del.textContent = 'Eliminar';
-        del.onclick = () => {
+        del.onclick = async () => {
           const pwd = prompt('Password para eliminar:');
           if (pwd !== PASSWORD) { alert('Password incorreta!'); return; }
-          const purchases = loadPurchases();
-          purchases.splice(purchases.length - 1 - idx, 1); // because reversed
-          savePurchases(purchases);
+          await deletePurchase(p.id, pwd);
           render();
         };
         li.appendChild(del);
@@ -78,35 +101,27 @@
       });
     }
 
-    document.getElementById('addBtn').onclick = () => {
+    // Handler do botão Adicionar
+    document.getElementById('addBtn').onclick = async () => {
       const packs = parseInt(document.getElementById('packs').value);
       const password = document.getElementById('password').value;
       const errorMsg = document.getElementById('errorMsg');
       errorMsg.textContent = '';
 
       if (!packs || packs < 1) return alert('Número inválido');
-      if (password !== PASSWORD) {
-        errorMsg.textContent = 'Password incorreta!';
-        return; // mantém o valor para correção
+
+      const result = await addPurchase(packs, password);
+      if (result.error) {
+        errorMsg.textContent = result.error;
+        return;
       }
-
-      const purchase = {
-        id: Date.now(),
-        date: new Date().toISOString().split('T')[0],
-        packs,
-        stickers: packs * 7,
-        cost: packs * 1.5
-      };
-
-      const purchases = loadPurchases();
-      purchases.push(purchase);
-      savePurchases(purchases);
 
       document.getElementById('packs').value = 1;
       document.getElementById('password').value = '';
       render();
     };
 
+    // Inicializar
     render();
   </script>
 </body>
