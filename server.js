@@ -49,7 +49,8 @@ app.post('/api/purchases', async (req, res) => {
         packs,
         stickers: packs * 7,
         cost: packs * 1.5,
-      });
+      })
+      .select();
     if (error) throw error;
     res.status(201).json(data);
   } catch (err) {
