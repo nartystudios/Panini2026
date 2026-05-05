@@ -3,52 +3,238 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registo de Saquetas de Cromos</title>
+  <title>Registo de Saquetas de Cromos - Mundial 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem;}
-    h1 {text-align: center;}
-    .summary {margin-top: 1rem; padding: 1rem; border: 1px solid #ddd;}
-    input[type='number'], input[type='password'], input[type='date'] {width: 120px; padding: 0.3rem;}
-    button {margin-left: .5rem; padding: 0.4rem 0.8rem;}
-    ul {list-style:none; padding:0;}
-    li {margin: .5rem 0; border-bottom:1px solid #eee; padding-bottom:.5rem;}
-    .error {color: #d00; font-size: 0.9rem;}
+    :root {
+      /* Cores oficiais do Mundial de Futebol 2026 */
+      --primary-blue: #0057B8;
+      --primary-red: #D52B1E;
+      --primary-green: #009A44;
+      --primary-yellow: #FFD100;
+      --light-bg: #F8F9FA;
+      --card-bg: #FFFFFF;
+      --text-dark: #212529;
+      --text-muted: #6C757D;
+      --border: #DEE2E6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--light-bg);
+      color: var(--text-dark);
+      line-height: 1.6;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+    }
+
+    h1 {
+      color: var(--primary-blue);
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: var(--primary-blue);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    input[type="number"],
+    input[type="password"],
+    input[type="date"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(0, 87, 184, 0.1);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: white;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: #004A9A;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 87, 184, 0.2);
+    }
+
+    .btn-danger {
+      background: var(--primary-red);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      border-radius: 6px;
+    }
+
+    .btn-danger:hover {
+      background: #B51A15;
+    }
+
+    .summary-card {
+      background: #E9F7FE;
+      border: 1px solid #B8D4F0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .summary-card p {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .summary-card span {
+      font-weight: 600;
+    }
+
+    .total-stickers {
+      color: var(--primary-green);
+    }
+
+    .total-cost {
+      color: var(--primary-yellow);
+    }
+
+    .history-list {
+      list-style: none;
+    }
+
+    .history-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .history-item:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .history-content {
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    .error {
+      color: var(--primary-red);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <h1>Registo de Saquetas de Cromos</h1>
+  <div class="container">
+    <h1>Registo de Saquetas de Cromos</h1>
+    <p class="subtitle">Mundial de Futebol 2026</p>
 
-  <div>
-    <label for="packs">Número de saquetas:</label>
-    <input type="number" id="packs" min="1" value="1" />
-  </div>
-  <div style="margin-top:0.5rem;">
-    <label for="date">Data (opcional):</label>
-    <input type="date" id="date" />
-  </div>
-  <div style="margin-top:0.5rem;">
-    <label for="password">Password:</label>
-    <input type="password" id="password" />
-    <span id="errorMsg" class="error"></span>
-  </div>
-  <div style="margin-top:0.8rem;">
-    <button id="addBtn">Adicionar</button>
-  </div>
+    <div class="form-group">
+      <label for="packs">Número de saquetas:</label>
+      <input type="number" id="packs" min="1" value="1" />
+    </div>
 
-  <div class="summary" id="summary">
-    <p>Total de cromos: <span id="totalStickers">0</span></p>
-    <p>Total gasto: <span id="totalCost">0.00</span> €</p>
-  </div>
+    <div class="form-group">
+      <label for="date">Data (opcional):</label>
+      <input type="date" id="date" />
+    </div>
 
-  <h2>Histórico de compras</h2>
-  <ul id="history"></ul>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" />
+      <div id="errorMsg" class="error"></div>
+    </div>
+
+    <button id="addBtn" class="btn btn-primary">Adicionar Compra</button>
+
+    <div class="summary-card">
+      <p>Total de cromos: <span id="totalStickers" class="total-stickers">0</span></p>
+      <p>Total gasto: <span id="totalCost" class="total-cost">0.00</span> €</p>
+    </div>
+
+    <h2>Histórico de Compras</h2>
+    <ul id="history" class="history-list"></ul>
+  </div>
 
   <script>
-    // API endpoints
     const API_URL = '/api/purchases';
-    const PASSWORD='***'; // mesma password do server.js
+    const PASSWORD = 'cricri'; // Senha correta (igual ao server.js)
 
-    // Carregar compras da API
     async function loadPurchases() {
       try {
         const response = await fetch(API_URL);
@@ -59,17 +245,15 @@
       }
     }
 
-    // Adicionar compra via API
     async function addPurchase(packs, password, date) {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packs, password, date })  // date pode ser null
+        body: JSON.stringify({ packs, password, date })
       });
       return response.json();
     }
 
-    // Eliminar compra via API
     async function deletePurchase(id, password) {
       const response = await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
@@ -79,51 +263,68 @@
       return response.json();
     }
 
-    // Renderizar interface
     async function render() {
       const purchases = await loadPurchases();
       const totalStickers = purchases.reduce((a, p) => a + p.stickers, 0);
       const totalCost = purchases.reduce((a, p) => a + p.cost, 0);
+
       document.getElementById('totalStickers').textContent = totalStickers;
       document.getElementById('totalCost').textContent = totalCost.toFixed(2);
 
       const list = document.getElementById('history');
       list.innerHTML = '';
-      purchases.slice().reverse().forEach((p, idx) => {
+
+      purchases.slice().reverse().forEach((p) => {
         const li = document.createElement('li');
-        li.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, gasto ${p.cost.toFixed(2)} € `;
-        const del = document.createElement('button');
-        del.textContent = 'Eliminar';
-        del.onclick = async () => {
+        li.className = 'history-item';
+
+        const content = document.createElement('div');
+        content.className = 'history-content';
+        content.textContent = `${p.date}: ${p.packs} saqueta(s) → ${p.stickers} cromos, ${p.cost.toFixed(2)} €`;
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-danger';
+        delBtn.textContent = 'Eliminar';
+        delBtn.onclick = async () => {
           const pwd = prompt('Password para eliminar:');
           if (pwd !== PASSWORD) { alert('Password incorreta!'); return; }
           await deletePurchase(p.id, pwd);
           render();
         };
-        li.appendChild(del);
+
+        li.appendChild(content);
+        li.appendChild(delBtn);
         list.appendChild(li);
       });
     }
 
-    // Handler do botão Adicionar
     document.getElementById('addBtn').onclick = async () => {
       const packs = parseInt(document.getElementById('packs').value);
       const password = document.getElementById('password').value;
-      const date = document.getElementById('date').value || null;  // date optional
+      const date = document.getElementById('date').value || null;
       const errorMsg = document.getElementById('errorMsg');
+
+      errorMsg.classList.remove('show');
       errorMsg.textContent = '';
 
-      if (!packs || packs < 1) return alert('Número inválido');
-
-      const result = await addPurchase(packs, password, date);
-      if (result.error) {
-        errorMsg.textContent = result.error;
+      if (!packs || packs < 1) {
+        alert('Número inválido de saquetas');
         return;
       }
 
+      const result = await addPurchase(packs, password, date);
+
+      if (result.error) {
+        errorMsg.textContent = result.error;
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      // Limpar campos
       document.getElementById('packs').value = 1;
       document.getElementById('password').value = '';
       document.getElementById('date').value = '';
+
       render();
     };
 
